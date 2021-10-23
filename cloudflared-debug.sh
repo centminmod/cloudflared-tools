@@ -87,6 +87,12 @@ tunnel_debug() {
     fi
 
     ss
+    echo "Check cloudflared.service file"
+    echo "/etc/systemd/system/cloudflared.service"
+    se
+    cat /etc/systemd/system/cloudflared.service
+
+    ss
     echo "Tunnel Info"
     echo "cloudflared tunnel info $tunnel_name"
     se
