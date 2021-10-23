@@ -3,8 +3,11 @@
 # cloudflared open file debugging
 ####################################################
 DT=$(date +"%d%m%y-%H%M%S")
-SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+TUNNEL_CONFIGFILE='/etc/cloudflared/config.yml'
 TAIL_LINES='30'
+
+SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+####################################################
 
 if [ -f "$SCRIPTDIR/cloudflared-debug.ini" ]; then
   . "$SCRIPTDIR/cloudflared-debug.ini"
@@ -88,6 +91,14 @@ tunnel_debug() {
     echo "cloudflared tunnel info $tunnel_name"
     se
     cloudflared tunnel info $tunnel_name
+
+    if [ -f "$TUNNEL_CONFIGFILE" ]; then
+      ss
+      echo "Tunnel $TUNNEL_CONFIGFILE"
+      echo "cat $TUNNEL_CONFIGFILE"
+      se
+      cat "$TUNNEL_CONFIGFILE"
+    fi
 
     ss
     echo "Open file descriptors for cloudflared"
