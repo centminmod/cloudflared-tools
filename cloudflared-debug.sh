@@ -17,7 +17,7 @@ cfmetrics() {
   echo "cloudflared metrics"
   echo "127.0.0.1:5432/metrics"
   se
-  curl -s 127.0.0.1:5432/metrics | egrep 'fds|go_threads|process_resident_|process_virtual_' | egrep -v '# TYPE' | sed -e 's| HELP ||g'
+  curl -s 127.0.0.1:5432/metrics | egrep 'cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
 }
 
 netstat_info() {
@@ -88,8 +88,6 @@ tunnel_debug() {
     echo "cloudflared tunnel info $tunnel_name"
     se
     cloudflared tunnel info $tunnel_name
-
-    cfmetrics
 
     ss
     echo "Open file descriptors for cloudflared"
