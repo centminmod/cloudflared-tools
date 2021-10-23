@@ -107,6 +107,12 @@ tunnel_debug() {
     fi
 
     ss
+    echo "nginx.conf client_* settings"
+    echo "grep 'client_' /usr/local/nginx/conf/nginx.conf"
+    se
+    grep 'client_' /usr/local/nginx/conf/nginx.conf
+
+    ss
     echo "Open file descriptors for cloudflared"
     echo "ls -l /proc/\$(pidof cloudflared)/fd | wc -l"
     se
