@@ -137,7 +137,13 @@ tunnel_debug() {
     lsof -u root | wc -l
 
     ss
-    echo "journamctl cloudflared logs"
+    echo "journalctl cloudflared-update.timer"
+    echo "journalctl -u cloudflared-update.timer --no-pager | sed -e \"s|\$(hostname)|hostname|g\" | tail -${TAIL_LINES}"
+    se
+    journalctl -u cloudflared-update.timer --no-pager | sed -e "s|$(hostname)|hostname|g" | tail -${TAIL_LINES}
+
+    ss
+    echo "journalctl cloudflared logs"
     echo "journalctl -u cloudflared --no-pager | sed -e \"s|\$(hostname)|hostname|g\" | tail -${TAIL_LINES}"
     se
     journalctl -u cloudflared --no-pager | sed -e "s|$(hostname)|hostname|g" | tail -${TAIL_LINES}
