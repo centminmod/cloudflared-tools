@@ -4,7 +4,7 @@
 ####################################################
 DT=$(date +"%d%m%y-%H%M%S")
 TUNNEL_CONFIGFILE='/etc/cloudflared/config.yml'
-TAIL_LINES='30'
+TAIL_LINES='150'
 
 SCRIPTDIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 ####################################################
@@ -111,6 +111,12 @@ tunnel_debug() {
     echo "grep 'client_' /usr/local/nginx/conf/nginx.conf"
     se
     grep 'client_' /usr/local/nginx/conf/nginx.conf
+
+    ss
+    echo "nginx.conf timeout* settings"
+    echo "grep 'timeout' /usr/local/nginx/conf/nginx.conf"
+    se
+    grep 'timeout' /usr/local/nginx/conf/nginx.conf
 
     ss
     echo "Open file descriptors for cloudflared"
