@@ -17,10 +17,18 @@ ss() { echo -e "\n-------------------------------------------------"; }
 se() { echo -e "-------------------------------------------------\n"; }
 cfmetrics() {
   ss
-  echo "cloudflared metrics"
+  echo "cloudflared service metrics"
   echo "127.0.0.1:5432/metrics"
   se
   curl -s 127.0.0.1:5432/metrics | egrep 'cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
+
+  if [ -f /var/log/cloudflared2.log ]; then
+  ss
+  echo "cloudflared2 service metrics"
+  echo "127.0.0.1:5433/metrics"
+  se
+  curl -s 127.0.0.1:5433/metrics | egrep 'cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
+  fi
 }
 
 netstat_info() {
@@ -75,6 +83,9 @@ netstat_info() {
 tunnel_debug() {
     tunnel_name=$1
     ss
+    echo "Debug Report for $(date)"
+
+    ss
     echo "cloudflared service"
     se
     echo "systemctl status cloudflared"
@@ -86,11 +97,33 @@ tunnel_debug() {
       cat /etc/systemd/system/cloudflared.service.d/openfileslimit.conf
     fi
 
+    if [ -f /etc/systemd/system/cloudflared2.service ]; then
+      ss
+      echo "cloudflared2 service"
+      se
+      echo "systemctl status cloudflared2"
+      systemctl status cloudflared2 | sed -e "s|$(hostname)|hostname|g"
+      if [ -f /etc/systemd/system/cloudflared2.service.d/openfileslimit.conf ]; then
+        # systemd-delta --type=extended --no-pager | awk '/cloudflared2/ {print $4}'
+        echo
+        echo "cat /etc/systemd/system/cloudflared2.service.d/openfileslimit.conf"
+        cat /etc/systemd/system/cloudflared2.service.d/openfileslimit.conf
+      fi
+    fi
+
     ss
     echo "Check cloudflared.service file"
     echo "/etc/systemd/system/cloudflared.service"
     se
     cat /etc/systemd/system/cloudflared.service
+
+    if [ -f /etc/systemd/system/cloudflared2.service ]; then
+      ss
+      echo "Check cloudflared2.service file"
+      echo "/etc/systemd/system/cloudflared2.service"
+      se
+      cat /etc/systemd/system/cloudflared2.service
+    fi
 
     ss
     echo "Tunnel Info"
@@ -98,12 +131,28 @@ tunnel_debug() {
     se
     cloudflared tunnel info $tunnel_name
 
+    if [ "$tunnel_name2" ]; then
+      ss
+      echo "Tunnel Info"
+      echo "cloudflared tunnel info $tunnel_name2"
+      se
+      cloudflared tunnel info $tunnel_name2
+    fi
+
     if [ -f "$TUNNEL_CONFIGFILE" ]; then
       ss
       echo "Tunnel $TUNNEL_CONFIGFILE"
       echo "cat $TUNNEL_CONFIGFILE"
       se
       cat "$TUNNEL_CONFIGFILE"
+    fi
+
+    if [ -f "$TUNNEL_CONFIGFILE2" ]; then
+      ss
+      echo "Tunnel $TUNNEL_CONFIGFILE2"
+      echo "cat $TUNNEL_CONFIGFILE2"
+      se
+      cat "$TUNNEL_CONFIGFILE2"
     fi
 
     ss
@@ -122,13 +171,21 @@ tunnel_debug() {
     echo "Open file descriptors for cloudflared"
     echo "ls -l /proc/\$(pidof cloudflared)/fd | wc -l"
     se
-    ls -l /proc/$(pidof cloudflared)/fd | wc -l
+    cfpids=$(pidof cloudflared)
+    for n in $cfpids; do
+      echo "ls -l /proc/$n/fd | wc -l"
+      ls -l /proc/$n/fd | wc -l
+    done
 
     ss
     echo "Current limits for cloudflared"
-    echo "cat /proc/\$(pidof cloudflared)/limits"
+    echo "inspect /proc/\$(pidof cloudflared)/limits"
     se
-    cat /proc/$(pidof cloudflared)/limits
+    cfpids=$(pidof cloudflared)
+    for n in $cfpids; do
+      echo "cat /proc/$n/limits"
+      cat /proc/$n/limits
+    done
 
     ss
     echo "Open files for root"
@@ -148,11 +205,27 @@ tunnel_debug() {
     se
     journalctl -u cloudflared --no-pager | sed -e "s|$(hostname)|hostname|g" | tail -${TAIL_LINES}
 
+    if [ -f /var/log/cloudflared2.log ]; then
+      ss
+      echo "journalctl cloudflared2 logs"
+      echo "journalctl -u cloudflared2 --no-pager | sed -e \"s|\$(hostname)|hostname|g\" | tail -${TAIL_LINES}"
+      se
+      journalctl -u cloudflared2 --no-pager | sed -e "s|$(hostname)|hostname|g" | tail -${TAIL_LINES}
+    fi
+
     ss
     echo "cloudflared log tail"
     echo "tail -100 /var/log/cloudflared.log | tail -${TAIL_LINES} | jq"
     se
     tail -100 /var/log/cloudflared.log | tail -${TAIL_LINES} | jq
+
+    if [ -f /var/log/cloudflared2.log ]; then
+      ss
+      echo "cloudflared log tail"
+      echo "tail -100 /var/log/cloudflared2.log | tail -${TAIL_LINES} | jq"
+      se
+      tail -100 /var/log/cloudflared2.log | tail -${TAIL_LINES} | jq
+    fi
 
     cfmetrics
     netstat_info
