@@ -129,14 +129,14 @@ tunnel_debug() {
     echo "Tunnel Info"
     echo "cloudflared tunnel info $tunnel_name"
     se
-    cloudflared tunnel info $tunnel_name
+    cloudflared tunnel list -o json | jq -r --arg h $tunnel_name '.[] | select(.name == $h)'
 
     if [ "$tunnel_name2" ]; then
       ss
       echo "Tunnel Info"
       echo "cloudflared tunnel info $tunnel_name2"
       se
-      cloudflared tunnel info $tunnel_name2
+      cloudflared tunnel list -o json | jq -r --arg h $tunnel_name2 '.[] | select(.name == $h)'
     fi
 
     if [ -f "$TUNNEL_CONFIGFILE" ]; then
