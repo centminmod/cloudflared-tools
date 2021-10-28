@@ -93,6 +93,12 @@ netstat_info() {
   echo
   echo "netstat -sut"
   netstat -sut
+  echo
+  echo "netstat -su6"
+  netstat -su6
+  echo
+  echo "netstat -plantu | egrep 'cloudflared|nginx|php'"
+  netstat -plantu | egrep 'cloudflared|nginx|php'
 }
 
 tunnel_debug() {
