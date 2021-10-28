@@ -78,6 +78,21 @@ netstat_info() {
   echo "$netstat_ipstopf"
   echo -e "\nTop Outbound Connections:"
   echo "$netstat_outbound"
+  echo
+  ss
+  echo "Receive buffer sizes"
+  se
+  echo "sysctl net.core.rmem_max"
+  sysctl net.core.rmem_max
+  echo "sysctl net.core.rmem_default"
+  sysctl net.core.rmem_default
+  echo "sysctl net.core.wmem_max"
+  sysctl net.core.wmem_max
+  echo "sysctl net.core.wmem_default"
+  sysctl net.core.wmem_default
+  echo
+  echo "netstat -sut"
+  netstat -sut
 }
 
 tunnel_debug() {
