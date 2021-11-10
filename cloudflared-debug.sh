@@ -20,14 +20,14 @@ cfmetrics() {
   echo "cloudflared service metrics"
   echo "127.0.0.1:5432/metrics"
   se
-  curl -s 127.0.0.1:5432/metrics | egrep 'cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
+  curl -s 127.0.0.1:5432/metrics | egrep 'quic_client|cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
 
   if [ -f /var/log/cloudflared2.log ]; then
   ss
   echo "cloudflared2 service metrics"
   echo "127.0.0.1:5433/metrics"
   se
-  curl -s 127.0.0.1:5433/metrics | egrep 'cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
+  curl -s 127.0.0.1:5433/metrics | egrep 'quic_client|cloudflared_tunnel_active_streams|cloudflared_tunnel_concurrent_requests_per_tunnel|cloudflared_tunnel_ha_connections|cloudflared_tunnel_request_errors|cloudflared_tunnel_response_by_code|cloudflared_tunnel_timer_retries|cloudflared_tunnel_total_requests|cloudflared_tunnel_tunnel_register_success|go_gc_duration_seconds|go_goroutines|go_memstats|process_cpu_seconds_total|fds|go_threads|process_resident_|process_virtual_|cloudflared_tunnel_server_locations' | egrep -v '# TYPE' | sed -e 's| HELP ||g' -e 's|#|------------------------------\n|g'
   fi
 }
 
