@@ -15,6 +15,19 @@ fi
 
 ss() { echo -e "\n-------------------------------------------------"; }
 se() { echo -e "-------------------------------------------------\n"; }
+
+pidstat_cloudflared() {
+  ss
+  echo "pidstat"
+  echo "pidstat -durlh -C cloudflared 1 10"
+  se
+  pidstat -durlh -C cloudflared 1 10
+  ss
+  echo "pidstat -durlh 1 10"
+  se
+  pidstat -durlh 1 10
+}
+
 cfmetrics() {
   ss
   echo "cloudflared service metrics"
@@ -249,6 +262,7 @@ tunnel_debug() {
     fi
 
     cfmetrics
+    pidstat_cloudflared
     netstat_info
 }
 
